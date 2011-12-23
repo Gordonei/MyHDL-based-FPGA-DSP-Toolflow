@@ -11,7 +11,7 @@ Guide to Project Contents
 =========================
 
 1) Supporting - directory for utilities supporting 
-  1.1) DFT_Arithmetic_Model - a simple arithmetic model for performing a Discrete Furiour Transform
+  1.1) DFT_Arithmetic_Model -
 
 2) Tooflow Code - directory for the toolflow code, including the base Actor class and its dynesty, as well as the toolflow testbenchs
 	*
