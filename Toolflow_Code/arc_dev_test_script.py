@@ -27,28 +27,36 @@ def test_bench_arc(arc,no_inputs,input_bitwidth,no_outputs,output_bitwidth,compl
     @instance
     def arc_write_test():
         count = 0
-        while(count<len(test_data[0])):
+        while(count*no_inputs<len(test_data[0])):
             yield delay(1)
             if(not arc.input_stall):
-                for i in range(no_inputs): arc.buffer_real[arc.input_index+i].next = test_data[0][count+i]
+                for i in range(no_inputs): 
+                    arc.buffer_real[arc.input_index+i].next = test_data[0][count*no_inputs+i]
+                    
+                print "%d: Inputing %s" % (now(),str(test_data[0][count*no_inputs:count*no_inputs+no_inputs]))
                 arc.input_trigger.next = 1
-                count = count + 1
-                yield delay(5)
+                count += 1
+                yield delay(1)
                 arc.input_trigger.next = 0
-                yield delay(5)
+                yield delay(1)
+                
+            #else: print "%d: Input Stalled" % now()
+            
                 
     @instance
     def arc_read_test():
         count = 0
-        while(count<len(test_data[0])):
+        while(count*no_outputs<len(test_data[0])):
             yield delay(1)
             if(not arc.output_stall):
-                print "%d: %s" % (now(),str(arc.buffer_real[arc.output_index:arc.output_index+no_outputs]))
                 arc.output_trigger.next = 1
-                count + 1
-                yield delay(6)
+                print "%d: Outputting %s" % (now(),str(arc.buffer_real[arc.output_index:arc.output_index+no_outputs]))
+                count += 1
+                yield delay(1)
                 arc.output_trigger.next = 0
-                yield delay(6)
+                yield delay(1)
+                
+            #else: print "%d: Output Stalled" % now()
                 
     
     """clk = Signal(bool(0))            
@@ -59,17 +67,17 @@ def test_bench_arc(arc,no_inputs,input_bitwidth,no_outputs,output_bitwidth,compl
     return instances()
 
 #Arc Parameters
-no_inputs = 1
+no_inputs = 4
 input_bitwidth = 8
 
 no_outputs = 2
 output_bitwidth = 8
 
 complex_valued = False
-size_factor = 10
+size_factor = 2
 
 #Simulation Parameters
-test_data = [range(16)]
+test_data = [range(no_inputs*no_outputs*2)]
 
 #Simulation
 #arc_test_bench_inst = test_bench_arc(no_inputs,input_bitwidth,no_outputs,output_bitwidth,complex_valued,test_data)
@@ -77,4 +85,4 @@ test_data = [range(16)]
 arc = Arc.Arc(no_inputs,input_bitwidth,no_outputs,output_bitwidth,complex_valued,size_factor)
 signal_trace = traceSignals(test_bench_arc,arc,no_inputs,input_bitwidth,no_outputs,output_bitwidth,complex_valued,test_data)
 simulation = Simulation(signal_trace)
-simulation.run(300)
+simulation.run(100)

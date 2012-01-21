@@ -97,20 +97,23 @@ class Arc:
                 if((input_index+self.no_inputs)<self.size): #checking to see if the next set of samples is within the length of the storage array
                     input_index.next = input_index+self.no_inputs #increment the counter
                     
-                    if(((input_index+self.no_inputs)>=output_index) and (input_loop_count>output_loop_count)): input_stall.next = 1 #checking if the FIFO is full, and hence stalling if so
+                    if(((input_index+self.no_inputs)>=output_index) and (input_loop_count>output_loop_count)): 
+                        input_stall.next = 1 #checking if the FIFO is full, and hence stalling if so
                     #elif((input_loop_count==output_loop_count) and (input_index>self.no_inputs) and (output_index>self.no_outputs)): input_loop_count.next = 0 #reseting the loop counter
                     
                 else: #loop around behaviour
                     input_index.next = 0 
                     input_loop_count.next = input_loop_count+1
                     
-                    if((output_index<=self.no_inputs) and ((input_loop_count+1)>=output_loop_count)): input_stall.next = 1 #checking if the FIFO is full, and hence stalling if so
+                    if((output_index<=self.no_inputs) and ((input_loop_count+1)>=output_loop_count)): 
+                        input_stall.next = 1 #checking if the FIFO is full, and hence stalling if so
                     
         @always(output_trigger.posedge)
         def receiving_stall_behaviour():
             if(output_trigger and input_stall): #data has been read from the Arc, while in a full state
-                if((((input_index+self.no_inputs)<=(output_index+self.no_outputs)) and (input_loop_count<=output_loop_count)) or (input_loop_count<output_loop_count)): input_stall.next = 0 #undoing the stall if the new read has freed up enough space
-                    
+                if((((output_index+self.no_outputs)<=(input_index+self.no_inputs)<self.size) and (input_loop_count==output_loop_count)) or ((output_index+self.no_outputs>=self.size) and (input_loop_count==(output_loop_count+1)) and (self.no_outputs<=(input_index+self.no_inputs)))): input_stall.next = 0 #undoing the stall if the new read has freed up enough space
+        #if((((output_index+self.no_outputs)<=(input_index+self.no_inputs))) and (output_loop_count<=input_loop_count) or (input_loop_count>output_loop_count)): output_stall.next = 0 #checking to see if there is now sufficient data in the Arc to be read
+
         return receiving_behaviour,receiving_stall_behaviour
         
     def transmitting(self):
@@ -135,19 +138,24 @@ class Arc:
                 if((output_index+self.no_outputs)<self.size): #if the read is within the current length of the storage array
                     output_index.next = output_index+self.no_outputs
                     
-                    if(((output_index+self.no_outputs)>=input_index) and (output_loop_count<=input_loop_count)): output_stall.next = 1 #checking to see if the array is now empty
+                    if(((output_index+self.no_outputs)>=input_index) and (output_loop_count==input_loop_count)): 
+                        output_stall.next = 1 #checking to see if the array is now empty
+                        
                     #elif((input_loop_count==output_loop_count) and (input_index>self.no_inputs) and (output_index>self.no_outputs)): output_loop_count.next = 0 #resetting the loop counter
                     
                 else:
                     output_index.next = 0 #loop around behaviour
                     output_loop_count.next = output_loop_count+1
                     
-                    if((input_index<=self.no_outputs) and ((output_loop_count+1)<=input_loop_count)): output_stall.next = 1 #checking to see if the array is now empty
+                    if((input_index<=self.no_outputs) and ((output_loop_count+1)==input_loop_count)): 
+                        output_stall.next = 1 #checking to see if the array is now empty
                 
         @always(input_trigger.posedge)
         def transmitting_stall_behaviour():
             if(input_trigger and output_stall): #data has been written into the Arc, while in the empty state
-                if((((output_index+self.no_outputs)<=(input_index+self.no_inputs))) and (output_loop_count<=input_loop_count) or (input_loop_count>output_loop_count)): output_stall.next = 0 #checking to see if there is now sufficient data in the Arc to be read
+                #if((((output_index+self.no_outputs)<=(input_index+self.no_inputs)<self.size) and (output_loop_count==input_loop_count)) or ((input_index+self.no_inputs) and ((input_loop_count+1)==output_loop_count) and (self.no_inputs < input_index + self.no_inputs))): output_stall.next = 0 #checking to see if there is now sufficient data in the Arc to be read
+                if((((output_index+self.no_outputs)<=(input_index+self.no_inputs)<self.size) and (input_loop_count==output_loop_count)) or (((input_index+self.no_inputs)>=self.size) and ((input_loop_count+1)>=output_loop_count) and (self.no_outputs<=(input_index+self.no_inputs)))): output_stall.next = 0 #undoing the stall if the new read has freed up enough space
+
             
         return transmitting_behaviour,transmitting_stall_behaviour
     
