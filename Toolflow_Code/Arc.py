@@ -55,16 +55,16 @@ class Arc:
         self.input_bitwidth = input_bitwidth
         
         #input signals
-        #self.input_trigger = input_trigger
-        #self.input_stall = input_stall
+        self.input_trigger = Signal(bool(0))
+        self.input_stall = Signal(bool(0))
         
         #output parameters
         self.no_outputs = no_outputs
         self.output_bitwidth = output_bitwidth
         
         #output signals
-        #self.output_trigger = output_trigger
-        #self.output_stall = output_stall
+        self.output_trigger = Signal(bool(0))
+        self.output_stall = Signal(bool(1))
         
         #arc parameters
         self.complex_valued = complex_valued
@@ -75,6 +75,8 @@ class Arc:
         self.input_index = Signal(intbv(0,min=-2**(self.size-1),max=2**(self.size-1)))
         
         self.output_index = Signal(intbv(0,min=-2**(self.size-1),max=2**(self.size-1)))
+        
+        #print id(self.input_trigger)
         
     def receiving(self):
         input_trigger = self.input_trigger
