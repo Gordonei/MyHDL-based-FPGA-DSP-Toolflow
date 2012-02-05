@@ -9,11 +9,11 @@ Watch this space!
 
 Guide to Project Contents
 =========================
-1) Supporting - directory for utilities used to create/look at the data that might be created by the toolflow
-  1.1) DFT_Arithmetic_Model - a simple arithmetic model for performing a Discrete Furiour Transform
+1) Supporting - directory for utilities used to create/look at the data that might be used/created by the toolflow
+	1.1) DFT_Arithmetic_Model - a simple arithmetic model for performing a Discrete Furiour Transform using my flexible-radix DFT algorithm 
 
-2) Tooflow Code - directory for the toolflow code, including the base Actor and Arc classes and its dynesty, as well as the module development testbenchs.
-  2.1) Old HDFT Code - first iteration of the code, used to implement my flexible-radix FFT algorithm which takes advantage of FPGA multipliers.
+2) Tooflow_Code - directory for the toolflow code, including the base Actor and Arc classes and its dynesty, as well as the module development testbenchs.
+	2.1) Old_HDFT_Code - first iteration of the toolflow, used to implement my flexible-radix FFT algorithm which takes advantage of FPGA multipliers.
 	*
 
 Dependencies
@@ -26,10 +26,18 @@ Dependencies
 
 Getting Started
 ===============
-Still getting going, so haven't made a proper egg and install script, etc. 
+Still getting going, so haven't made a proper egg and install script, etc. I'm a big believer in tutorials, so I should get those going sometime.
 
 That being said, its pretty straight-forward to use:
 1) Make sure you have the dependencies installed
 2) Copy the code in the Toolflow Code directory into the directory in which you intend to create your DSP system.
-3) Import the various libraries as needed in your code.
+3) Import the various libraries as needed in your code. Look at the dev scripts for guidance as how to use the library.
+	*
+
+Development Plan
+================
+1) Fundemental Arc and Actor Classes - working in simulation, as well as conversion to Verilog.
+2) Developing Rhino Gateware Framework - combination of MyHDL and HDL for testing converted graphs on the Rhino Platform (www.rhinoplatform.org)
+3) Developing Actors for flexible-radix DFT Algorithm
+4) Combining and testing DFT Algorithm Actors into an implementation of the my flexible-radix DFT algorithm.
 	*

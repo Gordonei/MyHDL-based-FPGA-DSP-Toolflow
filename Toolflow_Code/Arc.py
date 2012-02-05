@@ -105,21 +105,22 @@ class Arc:
                 
             
             elif(output_trigger and input_stall): #data has been read from the Arc, while in a full state
-                if((((output_index+no_outputs)<=(input_index+no_inputs)) and ((input_index+no_inputs)<=size) and (input_loop_count==output_loop_count)) or (((output_index+no_outputs)>=size) and (input_loop_count==(output_loop_count+1)) and (no_outputs<=(input_index+no_inputs)))): input_stall.next = False #undoing the stall if the new read has freed up enough space
-        
+                if((((output_index+no_outputs)<=(input_index+no_inputs)) and ((input_index+no_inputs)<=size) and (input_loop_count==output_loop_count)) or (((output_index+no_outputs)>=size) and (input_loop_count==(output_loop_count+1)))): input_stall.next = False #undoing the stall if the new read has freed up enough space
+        #and (no_outputs<=(input_index+no_inputs))
             elif(input_trigger and not input_stall): #data samples are being written into the Arc and the Arc is accepting values
                 if((input_index+no_inputs)<size):# and not(((input_index<output_index) and (input_index+self.no_inputs)>=output_index) and (input_loop_count>=output_loop_count))): #checking to see if the next set of samples is within the length of the storage array
                     
+                    input_index.next = input_index + no_inputs #increment the input pointer 
                     if((input_index<output_index) and ((input_index+no_inputs)>output_index) and (input_loop_count>=output_loop_count)): input_stall.next = True
-                    else: input_index.next = input_index + no_inputs #increment the input pointer 
                         
                     #elif((input_loop_count==output_loop_count) and (input_index>self.no_inputs) and (output_index>self.no_outputs)): input_loop_count.next = 0 #reseting the loop counter
                     
                 else: #and not(((output_index<=self.no_inputs) and ((input_loop_count+1)==output_loop_count)))): #loop around behaviour
+                    input_index.next = 0 
+                    input_loop_count.next = input_loop_count+1
+                    
                     if((output_index<no_inputs) and ((input_loop_count+1)>=output_loop_count)): input_stall.next = True# or (((input_loop_count+1)>output_loop_count) and (output_index<=input_index))): 
-                    else:
-                        input_index.next = 0 
-                        input_loop_count.next = input_loop_count+1
+                        
                     #checking if the FIFO is full, and hence stalling if so
                         
                 #else: input_stall.next = 1 #checking if the FIFO is full, and hence stalling if so
@@ -145,6 +146,7 @@ class Arc:
         
         @always(output_trigger.posedge,reset.posedge,input_trigger.posedge)
         def transmitting_behaviour():
+            
             if(reset):
                 output_index.next = 0
                 output_stall.next = True
@@ -157,21 +159,19 @@ class Arc:
                 
             elif(output_trigger and not output_stall): #data has been read from the Arc
                 if((output_index+no_outputs) < size): #if the read is within the current length of the storage array
+                    output_index.next = output_index + no_outputs
                     if((output_index<input_index) and ((output_index+no_outputs)>input_index) and (output_loop_count>=input_loop_count)):
                         #if((input_index<output_index) and ((input_index+no_inputs)>=output_index) and (input_loop_count>=output_loop_count)):
                         output_stall.next = True #checking to see if the array is now empty
                         
-                    else:
-                        output_index.next = output_index + no_outputs
-                    #elif((input_loop_count==output_loop_count) and (input_index>self.no_inputs) and (output_index>self.no_outputs)): output_loop_count.next = 0 #resetting the loop counter
+                     #elif((input_loop_count==output_loop_count) and (input_index>self.no_inputs) and (output_index>self.no_outputs)): output_loop_count.next = 0 #resetting the loop counter
                           
                 else:
+                    output_index.next = 0 #loop around behaviour
+                    output_loop_count.next = output_loop_count + 1
                     if(((input_index<=no_outputs) and ((output_loop_count+1)>=input_loop_count))): #or ((output_loop_count+1)>input_loop_count)): 
                         output_stall.next = True #checking to see if the array is now empty
                         
-                    else:
-                        output_index.next = 0 #loop around behaviour
-                        output_loop_count.next = output_loop_count + 1
                         
         return transmitting_behaviour#,transmitting_stall_behaviour
     

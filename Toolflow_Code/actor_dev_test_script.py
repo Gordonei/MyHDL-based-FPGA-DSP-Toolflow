@@ -41,7 +41,7 @@ def test_bench_actor(actor1,actor2,input_arc,actor1_actor2_arc,output_arc,no_inp
     
     @instance
     def actor_enable():
-        yield delay(5)
+        yield delay(0)
         print "%d: Actors being enabled" % now()
         actor1.enable.next = 1
         actor2.enable.next = 1
@@ -60,7 +60,7 @@ def test_bench_actor(actor1,actor2,input_arc,actor1_actor2_arc,output_arc,no_inp
                 count += 1
                 yield delay(1)
                 input_arc.input_trigger.next = 0
-                yield delay(1)
+                #yield delay(1)
                 
             else: print "%d: Input Stalled" % now()
                 
@@ -79,7 +79,7 @@ def test_bench_actor(actor1,actor2,input_arc,actor1_actor2_arc,output_arc,no_inp
                 count += 1
                 yield delay(1)
                 output_arc.output_trigger.next = 0
-                yield delay(1)
+                #yield delay(1)
                 
             else: print "%d: Output Stalled" % now()
                 
@@ -94,19 +94,19 @@ def test_bench_actor(actor1,actor2,input_arc,actor1_actor2_arc,output_arc,no_inp
     
     return instances()
 
-no_inputs = 1
+no_inputs = 1024
 input_bitwidth = 8
 
-no_outputs = 1
+no_outputs = 1024
 output_bitwidth = 8
 
-actor_scale = 1
+actor_scale = 1024
 
 complex_valued = False
-size_factor = 5
+size_factor = 1
 
 #Simulation Parameters
-test_set_size = 10
+test_set_size = 1
 #test_data = [range(no_inputs*no_outputs*test_set_size)]
 
 temp = []
@@ -126,10 +126,10 @@ actor1 = Actor.Actor(clk,input_arc,actor1_actor2_arc,actor_scale)
 actor2 = Actor.Actor(clk,actor1_actor2_arc,output_arc,actor_scale)
 
 #Simulation
-signal_trace = traceSignals(test_bench_actor,actor1,actor2,input_arc,actor1_actor2_arc,output_arc,no_inputs,input_bitwidth,no_outputs,output_bitwidth,complex_valued,test_data,clk)
-simulation = Simulation(signal_trace)
-simulation.run(100)
+#signal_trace = traceSignals(test_bench_actor,actor1,actor2,input_arc,actor1_actor2_arc,output_arc,no_inputs,input_bitwidth,no_outputs,output_bitwidth,complex_valued,test_data,clk)
+#simulation = Simulation(signal_trace)
+#simulation.run(5000)
 
 #Conversion
 
-#verilog_inst = toVerilog(actor_conversion_testbench,clk,reset,actor1,actor2,input_arc,actor1_actor2_arc,output_arc)
+verilog_inst = toVerilog(actor_conversion_testbench,clk,reset,actor1,actor2,input_arc,actor1_actor2_arc,output_arc)

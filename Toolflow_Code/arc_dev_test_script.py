@@ -22,15 +22,15 @@ def test_bench_arc(reset,arc,no_inputs,input_bitwidth,no_outputs,output_bitwidth
             yield delay(1)
             if(not arc.input_stall):
                 arc.input_trigger.next = 1
-                yield delay(1)
-                if(not arc.input_stall):
-                    for i in range(no_inputs): arc.buffer_real[arc.input_index+i].next = test_data[0][count*no_inputs+i]
+                #yield delay(1)
+                #if(not arc.input_stall):
+                for i in range(no_inputs): arc.buffer_real[arc.input_index+i].next = test_data[0][count*no_inputs+i]
                     
-                    print "%d: Inputing %s at location %d" % (now(),str(test_data[0][count*no_inputs:count*no_inputs+no_inputs]),arc.input_index)
-                    count += 1
+                print "%d: Inputing %s at location %d" % (now(),str(test_data[0][count*no_inputs:count*no_inputs+no_inputs]),arc.input_index)
+                count += 1
                 
-                arc.input_trigger.next = 0
                 yield delay(1)
+                arc.input_trigger.next = 0
                 
             else: print "%d: Input Stalled" % now()
             
@@ -43,14 +43,14 @@ def test_bench_arc(reset,arc,no_inputs,input_bitwidth,no_outputs,output_bitwidth
             yield delay(1)
             if(not arc.output_stall):
                 arc.output_trigger.next = 1
-                yield delay(1)
-                if(not arc.output_stall):
-                    print "%d: Outputting %s from location %d" % (now(),str(map(int,arc.buffer_real[arc.output_index:arc.output_index+no_outputs])),arc.output_index)
-                    output_data.extend(map(int,arc.buffer_real[arc.output_index:arc.output_index+no_outputs]))
-                    count += 1
+                #yield delay(1)
+                #if(not arc.output_stall):
+                print "%d: Outputting %s from location %d" % (now(),str(map(int,arc.buffer_real[arc.output_index:arc.output_index+no_outputs])),arc.output_index)
+                output_data.extend(map(int,arc.buffer_real[arc.output_index:arc.output_index+no_outputs]))
+                count += 1
                     
-                arc.output_trigger.next = 0
                 yield delay(1)
+                arc.output_trigger.next = 0
                 
             else: print "%d: Output Stalled" % now()
             
@@ -75,7 +75,7 @@ no_outputs = 1
 output_bitwidth = 8
 
 complex_valued = False
-size_factor = 2
+size_factor = 1
 
 #Simulation Parameters
 test_set_size = 10
@@ -96,4 +96,4 @@ reset = Signal(bool(0))
 arc = Arc.Arc(reset,no_inputs,input_bitwidth,no_outputs,output_bitwidth,complex_valued,size_factor)
 signal_trace = traceSignals(test_bench_arc,reset,arc,no_inputs,input_bitwidth,no_outputs,output_bitwidth,complex_valued,test_data)
 simulation = Simulation(signal_trace)
-simulation.run(100)
+simulation.run(1000)
