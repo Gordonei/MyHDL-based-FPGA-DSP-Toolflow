@@ -10,10 +10,13 @@ Watch this space!
 Guide to Project Contents
 =========================
 1) Supporting - directory for utilities used to create/look at the data that might be used/created by the toolflow
-	1.1) DFT_Arithmetic_Model - a simple arithmetic model for performing a Discrete Furiour Transform using my flexible-radix DFT algorithm 
+	1.1) DFT_Arithmetic_Model - a simple arithmetic model for performing a DFT using my flexible-radix DFT algorithm 
 
 2) Tooflow_Code - directory for the toolflow code, including the base Actor and Arc classes and its dynesty, as well as the module development testbenchs.
 	2.1) Old_HDFT_Code - first iteration of the toolflow, used to implement my flexible-radix FFT algorithm which takes advantage of FPGA multipliers.
+
+3) Platfroms - directory for platform-specific components of the toolflow
+	3.1) Rhino - utilities and components for the Reconfigurable Hardware for computatioN and radiO (Rhino) Platform (www.rhinoplatform.org)
 	*
 
 Dependencies
@@ -39,5 +42,5 @@ Development Plan
 1) Fundemental Arc and Actor Classes - working in simulation, as well as conversion to Verilog.
 2) Developing Rhino Gateware Framework - combination of MyHDL and HDL for testing converted graphs on the Rhino Platform (www.rhinoplatform.org)
 3) Developing Actors for flexible-radix DFT Algorithm
-4) Combining and testing DFT Algorithm Actors into an implementation of the my flexible-radix DFT algorithm.
+4) Combining and testing DFT Algorithm Actors into an implementation of the flexible-radix DFT algorithm.
 	*
