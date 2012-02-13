@@ -12,8 +12,9 @@ Guide to Project Contents
 1) Supporting - directory for utilities used to create/look at the data that might be used/created by the toolflow
 	1.1) DFT_Arithmetic_Model - a simple arithmetic model for performing a DFT using my flexible-radix DFT algorithm 
 
-2) Tooflow_Code - directory for the toolflow code, including the base Actor and Arc classes and its dynesty, as well as the module development testbenchs.
-	2.1) Old_HDFT_Code - first iteration of the toolflow, used to implement my flexible-radix FFT algorithm which takes advantage of FPGA multipliers.
+2) Tooflow_Code - directory for the toolflow code, including the base Actor and Arc classes, as well as the base module development testbenchs.
+	2.1) HDFT_Code - blocks and scripts for the new version of my flexible-radix FFT algorithm
+	2.2) Old_HDFT_Code - first iteration of the toolflow, used to implement my flexible-radix FFT algorithm which takes advantage of FPGA multipliers.
 
 3) Platfroms - directory for platform-specific components of the toolflow
 	3.1) Rhino - utilities and components for the Reconfigurable Hardware for computatioN and radiO (Rhino) Platform (www.rhinoplatform.org)
