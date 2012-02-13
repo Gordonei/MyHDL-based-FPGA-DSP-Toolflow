@@ -8,14 +8,6 @@ Created on 8 Feb 2012
 from myhdl import *
 import Actor
 
-def tf_real_f(i):
-            value = i
-            return value
-        
-def tf_imag_f(i):
-            value = i
-            return value
-
 class Butterfly(Actor.Actor):
     name = "Butterfly"
     
@@ -25,11 +17,12 @@ class Butterfly(Actor.Actor):
     tf_imag = ()
     
     twiddle_bits = 0
-    twiddle_factors_real = []
-    twiddle_factors_imag = []
-    
+    twiddle_factors_real = ()
+    twiddle_factors_imag = ()
     twiddle_rom_line_real = Signal(intbv(0))
     twiddle_rom_line_imag = Signal(intbv(0))
+    twiddle_rom_addr_real = Signal(intbv(0))
+    twiddle_rom_addr_imag = Signal(intbv(0))
     
     def __init__(self,clk,input_a,output_a,output_b,tf_real,tf_imag,twiddle_bits,scale=1):
         Actor.Actor.__init__(self,clk,input_a,output_a,scale)

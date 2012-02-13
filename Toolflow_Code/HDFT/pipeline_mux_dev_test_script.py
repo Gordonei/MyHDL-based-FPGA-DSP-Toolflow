@@ -130,8 +130,8 @@ mux = Pipeline_Mux.Pipeline_Mux(clk,input_arc,output_arc,actor_scale)
 
 #Simulation
 signal_trace = traceSignals(test_bench_mux,mux,input_arc,output_arc,no_inputs,input_bitwidth,no_outputs,output_bitwidth,complex_valued,test_data,clk)
-simulation = Simulation(signal_trace)
-simulation.run(100)
+#simulation = Simulation(signal_trace)
+#simulation.run(100)
 
 #Conversion
-#verilog_inst = toVerilog(mux_conversion_testbench,clk,reset,mux,input_arc,output_arc)
+verilog_inst = toVerilog(mux_conversion_testbench,clk,reset,mux,input_arc,output_arc)

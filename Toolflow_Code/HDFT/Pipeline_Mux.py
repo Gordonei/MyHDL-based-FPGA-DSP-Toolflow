@@ -1,6 +1,6 @@
 '''
 MyHDL-based FPGA DSP Toolflow
-Mux unit, inherits the Actor Base Class
+Pipeline Mux unit, inherits the Actor Base Class
 Created on 9 Feb 2012
 
 @author: Gordon Inggs
