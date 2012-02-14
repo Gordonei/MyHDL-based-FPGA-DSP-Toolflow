@@ -26,12 +26,12 @@ class DFT(Actor.Actor):
     twiddle_rom_addr_real = []
     twiddle_rom_addr_imag = []
     
-    def __init__(self,clk,input_a,output_a,output_b,tf_real,tf_imag,twiddle_bits,scale=1):
+    def __init__(self,clk,input_a,output_a,tf_real,tf_imag,twiddle_bits,scale=1):
         Actor.Actor.__init__(self,clk,input_a,output_a,scale)
         
         self.twiddle_bits = twiddle_bits
-        self.twiddle_factors_real = [Signal(intbv(0,min=-2**(self.twiddle_bits-1),max=2**(self.twiddle_bits-1))) for i in range(self.output_a.no_inputs)]
-        self.twiddle_factors_imag = [Signal(intbv(0,min=-2**(self.twiddle_bits-1),max=2**(self.twiddle_bits-1))) for i in range(self.output_a.no_inputs)]
+        self.twiddle_factors_real = [Signal(intbv(0,min=-2**(self.twiddle_bits-1),max=2**(self.twiddle_bits-1))) for i in range(self.output_a.no_inputs*self.output_a.no_inputs)]
+        self.twiddle_factors_imag = [Signal(intbv(0,min=-2**(self.twiddle_bits-1),max=2**(self.twiddle_bits-1))) for i in range(self.output_a.no_inputs*self.output_a.no_inputs)]
     
         self.twiddle_rom_line_real = [Signal(intbv(0,min=-2**(self.twiddle_bits-1),max=2**(self.twiddle_bits-1))) for i in range(self.output_a.no_inputs)]
         self.twiddle_rom_line_imag = [Signal(intbv(0,min=-2**(self.twiddle_bits-1),max=2**(self.twiddle_bits-1))) for i in range(self.output_a.no_inputs)]
@@ -39,15 +39,17 @@ class DFT(Actor.Actor):
         self.twiddle_rom_addr_real = Signal(intbv(0,min=0,max=output_a.no_inputs+1))
         self.twiddle_rom_addr_imag = Signal(intbv(0,min=0,max=output_a.no_inputs+1))
         
-        self.tf_rom_inst_real = [self.rom(self.twiddle_rom_line_real[i],self.twiddle_rom_addr_real,self.tf_real(i)) for i in range(output_a.no_inputs)]
-        self.tf_rom_inst_imag = [self.rom(self.twiddle_rom_line_imag[i],self.twiddle_rom_addr_imag,self.tf_imag(i)) for i in range(output_a.no_inputs)]
+        self.tf_real = tf_real
+        self.tf_imag = tf_imag
+            
+        self.tf_rom_inst_real = [self.rom(self.twiddle_rom_line_real[i],self.twiddle_rom_addr_real,self.tf_real[i]) for i in range(output_a.no_inputs)]
+        self.tf_rom_inst_imag = [self.rom(self.twiddle_rom_line_imag[i],self.twiddle_rom_addr_imag,self.tf_imag[i]) for i in range(output_a.no_inputs)]
         
     def processing(self):
         enable = self.enable
         reset = self.reset
         input_a = self.input_a
         output_a = self.output_a
-        output_b = self.output_b
         clk = self.clk
         
         output_stall = input_a.output_stall
@@ -58,20 +60,16 @@ class DFT(Actor.Actor):
         input_trigger_a = output_a.input_trigger
         input_index_a = output_a.input_index
         
-        input_stall_b = output_b.input_stall
-        input_trigger_b = output_b.input_trigger
-        input_index_b = output_b.input_index
-        
         scale = self.scale
         no_inputs = input_a.no_outputs
         no_outputs = output_a.no_inputs
+        output_bitwidth = output_a.input_bitwidth
         
         input_buffer_real = input_a.buffer_real
         input_buffer_imag = input_a.buffer_imag
-        output_buffer_a_real = output_a.buffer_real
-        output_buffer_a_imag = output_a.buffer_imag
-        output_buffer_b_real = output_b.buffer_real
-        output_buffer_b_imag = output_b.buffer_imag
+        
+        output_buffer_real = output_a.buffer_real
+        output_buffer_imag = output_a.buffer_imag
         
         ready = self.ready
         
@@ -83,8 +81,6 @@ class DFT(Actor.Actor):
         twiddle_factors_imag = self.twiddle_factors_imag
         
         count = Signal(intbv(0,min=0,max=no_inputs+1))
-        temp_value_real = Signal(intbv(0,min=2**(output_a.input_bitwidth-1),max=2**(output_a.input_bitwidth-1)))
-        temp_value_imag = Signal(intbv(0,min=2**(output_a.input_bitwidth-1),max=2**(output_a.input_bitwidth-1)))
         
         @always(enable.posedge,clk.posedge)
         def initialisation_behaviour():
@@ -99,7 +95,7 @@ class DFT(Actor.Actor):
                     twiddle_rom_addr_real.next = count+1
                     twiddle_rom_addr_imag.next = count+1
    
-                count.next = count+1
+                count.next = count + 1
                 
             elif(enable and clk):
                 ready.next = True
@@ -108,25 +104,29 @@ class DFT(Actor.Actor):
         def processing_behaviour():
             if(enable and ready and not output_stall and not input_stall_a and not output_trigger and not input_trigger_a):# and not input_a.output_trigger and not output_a.input_trigger):
                 for i in range(no_inputs):
+                    temp_value_real = intbv(0,min=-2**(output_bitwidth-1),max=2**(output_bitwidth-1))
+                    temp_value_imag = intbv(0,min=-2**(output_bitwidth-1),max=2**(output_bitwidth-1))
                     for j in range(no_inputs):
-                        temp_value_real += input_buffer_real[output_index+i]*(twiddle_factors_real[i*no_inputs+j]+twiddle_factors_imag[i*no_inputs+j]) - twiddle_factors_imag[i*no_inputs+j]*(input_buffer_real[output_index+i]+input_buffer_imag[output_index+i])
-                        temp_value_imag += input_buffer_real[output_index+i]*(twiddle_factors_real[i*no_inputs+j]+twiddle_factors_imag[i*no_inputs+j]) + twiddle_factors_real[i*no_inputs+j]*(input_buffer_imag[output_index+i]-input_buffer_real[output_index+i])
+                        temp_value_real += input_buffer_real[output_index+j]*(twiddle_factors_real[j*no_inputs+i]+twiddle_factors_imag[j*no_inputs+i]) - twiddle_factors_imag[j*no_inputs+i]*(input_buffer_real[output_index+j]+input_buffer_imag[output_index+j])
+                        temp_value_imag += input_buffer_real[output_index+j]*(twiddle_factors_real[j*no_inputs+i]+twiddle_factors_imag[j*no_inputs+i]) + twiddle_factors_real[j*no_inputs+i]*(input_buffer_imag[output_index+j]-input_buffer_real[output_index+j])
                     
-                    output_buffer_b_real[input_index_a+i].next = temp_value_real
-                    output_buffer_b_imag[input_index_a+i].next = temp_value_imag
+                    output_buffer_real[input_index_a+i].next = temp_value_real
+                    output_buffer_imag[input_index_a+i].next = temp_value_imag
                     
                 input_trigger_a.next = True
             elif(enable and ready):
                 input_trigger_a.next = False
                 
+        return processing_behaviour,initialisation_behaviour
+                
     def model(self,input_data):
         output_data = []
-            
+        
         for i in range(len(input_data)):
             temp_value = 0.0
             count = 0
             for i_d in input_data:
-                temp_value += i_d*(self.tf_real[i*len(input_data)+count]+1j*self.tf_imag[i*len(input_data)+count])
+                temp_value += (i_d)*(self.tf_real[i][count]+1j*self.tf_imag[i][count])
                 count += 1
                 
             output_data.append(temp_value)
