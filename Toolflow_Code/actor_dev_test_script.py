@@ -126,10 +126,10 @@ actor1 = Actor.Actor(clk,input_arc,actor1_actor2_arc,actor_scale)
 actor2 = Actor.Actor(clk,actor1_actor2_arc,output_arc,actor_scale)
 
 #Simulation
-#signal_trace = traceSignals(test_bench_actor,actor1,actor2,input_arc,actor1_actor2_arc,output_arc,no_inputs,input_bitwidth,no_outputs,output_bitwidth,complex_valued,test_data,clk)
-#simulation = Simulation(signal_trace)
-#simulation.run(5000)
+signal_trace = traceSignals(test_bench_actor,actor1,actor2,input_arc,actor1_actor2_arc,output_arc,no_inputs,input_bitwidth,no_outputs,output_bitwidth,complex_valued,test_data,clk)
+simulation = Simulation(signal_trace)
+simulation.run(100)
 
 #Conversion
 
-verilog_inst = toVerilog(actor_conversion_testbench,clk,reset,actor1,actor2,input_arc,actor1_actor2_arc,output_arc)
+#verilog_inst = toVerilog(actor_conversion_testbench,clk,reset,actor1,actor2,input_arc,actor1_actor2_arc,output_arc)

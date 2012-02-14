@@ -68,10 +68,10 @@ def test_bench_arc(reset,arc,no_inputs,input_bitwidth,no_outputs,output_bitwidth
     return instances()
 
 #Arc Parameters
-no_inputs = 1
+no_inputs = 10
 input_bitwidth = 8
 
-no_outputs = 1
+no_outputs = 10
 output_bitwidth = 8
 
 complex_valued = False
