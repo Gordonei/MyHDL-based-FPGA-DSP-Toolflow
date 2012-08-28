@@ -62,8 +62,15 @@ class Actor:
         def initialisation_behaviour():
             if(not ready): ready.next = True
         
-        @always(enable.posedge,reset.posedge,clk)
+        @always(enable.posedge,reset.posedge,clk.posedge)
         def processing_behaviour():
+            """print enable
+            print ready
+            print output_stall
+            print input_stall
+            print output_trigger
+            print input_trigger"""
+            
             if(enable and ready and not output_stall and not input_stall and not output_trigger and not input_trigger):# and not input_a.output_trigger and not output_a.input_trigger):
                 #print "%d: Processing - copying %s from input arc, starting at %d to output arc, starting at %d" % (now(),str(input_a.buffer_real[input_a.output_index:input_a.output_index+self.scale]),input_a.output_index,output_a.input_index)
                 

@@ -98,10 +98,6 @@ for i_r in input_range:
             complex_valued = False
             size_factor = s_f
 
-            
-            
-            #test_data = [range(no_inputs*no_outputs*test_set_size)]
-
             temp = []
             for td in range(no_outputs*no_inputs*test_set_size): temp.append(int(random.random()*100))
 
