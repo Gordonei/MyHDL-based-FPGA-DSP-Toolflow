@@ -25,18 +25,18 @@ class Arc:
     #input variables and signals
     no_inputs = 0
     input_index = Signal(intbv(0))
-    input_trigger = Signal(bool(0)) #used to indicate that new values have been written
+    input_trigger = Signal(bool(False)) #used to indicate that new values have been written
     input_bitwidth = 0
     input_loop_count = Signal(intbv(0,max=255))
-    input_stall = Signal(bool(0)) #full
+    input_stall = Signal(bool(False)) #full
     
     #output variables and signals
     no_outputs = 0
     output_index = Signal(intbv(0))
-    output_trigger = Signal(bool(0)) #used to indicate that new values have been read
+    output_trigger = Signal(bool(False)) #used to indicate that new values have been read
     output_bitwidth = 0
     output_loop_count = Signal(intbv(0,max=255))
-    output_stall = Signal(bool(1)) #starts off empty
+    output_stall = Signal(bool(True)) #starts off empty
     
     #class variables
     size_factor = 0
@@ -106,10 +106,10 @@ class Arc:
                 input_loop_count.next = 0
                 
             
-            elif(output_trigger and input_stall): #data has been read from the Arc, while in a full state
+            elif(output_trigger==True and input_stall==True): #data has been read from the Arc, while in a full state
                 if((((output_index+no_outputs)<=(input_index+no_inputs)) and ((input_index+no_inputs)<=size) and (input_loop_count==output_loop_count)) or (((output_index+no_outputs)>=size) and (input_loop_count==(output_loop_count+1)))): input_stall.next = False #undoing the stall if the new read has freed up enough space
         #and (no_outputs<=(input_index+no_inputs))
-            elif(input_trigger and not input_stall): #data samples are being written into the Arc and the Arc is accepting values
+            elif(input_trigger==True and input_stall!=True): #data samples are being written into the Arc and the Arc is accepting values
                 if((input_index+no_inputs)<size):# and not(((input_index<output_index) and (input_index+self.no_inputs)>=output_index) and (input_loop_count>=output_loop_count))): #checking to see if the next set of samples is within the length of the storage array
                     
                     input_index.next = input_index + no_inputs #increment the input pointer
@@ -174,7 +174,7 @@ class Arc:
                 output_loop_count.next = 0
                 
                 
-            elif(input_trigger and output_stall): #data has been written into the Arc, while in the empty state (output_index+no_outputs)<size)
+            elif(input_trigger==True and output_stall==True): #data has been written into the Arc, while in the empty state (output_index+no_outputs)<size)
                 #if((((output_index+self.no_outputs)<=(input_index+self.no_inputs)<self.size) and (output_loop_count==input_loop_count)) or ((input_index+self.no_inputs) and ((input_loop_count+1)==output_loop_count) and (self.no_inputs < input_index + self.no_inputs))): output_stall.next = 0 #checking to see if there is now sufficient data in the Arc to be read
                 """print output_index
                 print input_index
@@ -182,7 +182,7 @@ class Arc:
                 print output_loop_count"""
                 if((((output_index+no_outputs)<=(input_index+no_inputs)) and ((input_index+no_inputs)<=size) and (input_loop_count>=output_loop_count)) or (((input_index+no_inputs)>=size) and ((input_loop_count+1)>=output_loop_count) and ((output_index+no_outputs)<=no_inputs))): output_stall.next = False #undoing the stall if the new read has freed up enough space
                 
-            elif(output_trigger and not output_stall): #data has been read from the Arc
+            elif((output_trigger==True) and (output_stall!=True)): #data has been read from the Arc
                 if((output_index+no_outputs) < size): #if the read is within the current length of the storage array
                     output_index.next = output_index + no_outputs
                     

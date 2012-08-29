@@ -106,6 +106,7 @@ output_bitwidth = 8
 
 verbose = False
 complex_valued = False
+conversion = True
 
 scale_range = [2**i for i in range(11)]
 test_set_range = [1]#range(1,11)
@@ -146,7 +147,8 @@ for s_r in scale_range:
             test_bench_actor_inst = test_bench_actor(actor1,actor2,input_arc,actor1_actor2_arc,output_arc,no_inputs,input_bitwidth,no_outputs,output_bitwidth,complex_valued,test_data,clk,verbose)
             simulation = Simulation(test_bench_actor_inst)
             simulation.run(100)
+            
+            if(conversion): verilog_inst = toVerilog(actor_conversion_testbench,clk,reset,actor1,actor2,input_arc,actor1_actor2_arc,output_arc)
 
 #Conversion
 
-#verilog_inst = toVerilog(actor_conversion_testbench,clk,reset,actor1,actor2,input_arc,actor1_actor2_arc,output_arc)

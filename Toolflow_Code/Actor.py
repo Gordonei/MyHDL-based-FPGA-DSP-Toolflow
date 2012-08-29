@@ -71,7 +71,7 @@ class Actor:
             print output_trigger
             print input_trigger"""
             
-            if(enable and ready and not output_stall and not input_stall and not output_trigger and not input_trigger):# and not input_a.output_trigger and not output_a.input_trigger):
+            if(enable==True and ready==True and output_stall!=True and input_stall!=True and output_trigger!=True and input_trigger!=True):# and not input_a.output_trigger and not output_a.input_trigger):
                 #print "%d: Processing - copying %s from input arc, starting at %d to output arc, starting at %d" % (now(),str(input_a.buffer_real[input_a.output_index:input_a.output_index+self.scale]),input_a.output_index,output_a.input_index)
                 
                 for i in range(scale): #Assumes that arcs have appropriate number of inputs and outputs set
